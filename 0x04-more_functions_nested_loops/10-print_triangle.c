@@ -1,37 +1,31 @@
-#include <stdio.h>
 #include "main.h"
-
 /**
-* print_remaining_days - takes a date and prints how many days are
-* left in the year, taking leap years into account
-* @month: month in number format
-* @day: day of month
-* @year: year
-* Return: void
-*/
-
-void print_remaining_days(int month, int day, int year)
+ * print_triangle - prints triangle
+ *
+ * @size: size of triangle
+ */
+void print_triangle(int size)
 {
-	if ((year % 100 == 0 && year % 400 == 0) || (year % 4 == 0))
-	{
-		if (month > 2 && day >= 60)
-		{
-			day++;
-		}
+	int i;
+	int j;
+	int k;
 
-		printf("Day of the year: %d\n", day);
-		printf("Remaining days: %d\n", 366 - day);
-	}
-	else
+	if (size <= 0)
 	{
-		if (month == 2 && day == 60)
+		_putchar('\n');
+	} else
+	{
+		for (i = 1; i <= size; i++)
 		{
-			printf("Invalid date: %02d/%02d/%04d\n", month, day - 31, year);
-		}
-		else
-		{
-			printf("Day of the year: %d\n", day);
-			printf("Remaining days: %d\n", 365 - day);
+			for (j = size - i ; j > 0; j--)
+			{
+				_putchar(' ');
+			}
+			for (k = 0; k < i; k++)
+			{
+				_putchar('#');
+			}
+			_putchar('\n');
 		}
 	}
 }
