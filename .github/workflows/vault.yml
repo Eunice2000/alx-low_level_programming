@@ -15,13 +15,13 @@ jobs:
 
       - name: Install Vault
         run: |
-          # Determine the GitHub Actions runner's architecture
-          ARCH=$(uname -m)
+          # Manually specify the architecture for x64 (amd64) Linux runner
+          ARCH=amd64
 
-          # Determine the latest Vault version
-          VAULT_VERSION=$(curl -s https://releases.hashicorp.com/vault/ | grep -oE 'vault_[0-9]+\.[0-9]+\.[0-9]+' | tail -n1)
+          # Manually specify the Vault version you want to install
+          VAULT_VERSION=1.8.2
 
-          # Download and install the correct Vault binary
+          # Download and install the specified Vault binary
           curl -fsSL "https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_${ARCH}.zip" -o vault.zip
           unzip vault.zip
           sudo mv vault /usr/local/bin/vault
