@@ -13,6 +13,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Install Vault
+        run: |
+          # Install Vault on the GitHub Actions runner
+          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/local/bin/vault
+          sudo chmod +x /usr/local/bin/vault
+          vault --version
+        shell: bash
+
       - name: Authenticate with Vault
         env:
           VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
