@@ -1,32 +1,35 @@
-name: Test Vault Secret Access
+name: Test Vault Access
 
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
-  test-secret-access:
+  test-vault-access:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-
       - name: Authenticate with Vault
         env:
           VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
-          KUBE_NAMESPACE: development
-    
+          VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
         run: |
-          VAULT_TOKEN=$(kubectl exec -n $KUBE_NAMESPACE pod-name -- vault write -field=token auth/kubernetes/login role=$VAULT_ROLE)
-          echo "::set-env name=VAULT_TOKEN::$VAULT_TOKEN"
+          # Authenticate with Vault using the provided token
+          vault login $VAULT_TOKEN
 
       - name: Retrieve Secret from Vault
         env:
           VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
         run: |
-          SECRET=$(vault kv get -field=your-secret-path kv/myapp/credentials)
+          # Retrieve a secret from Vault and store it in a variable
+          SECRET=$(vault kv get -field=<your-field-name> <your-secret-path>)
           echo "Vault Secret: $SECRET"
 
+      - name: Use Secret for Testing
+        run: |
+          # Use the retrieved secret in your testing, for example:
+          echo "Using Vault Secret: $SECRET"
