@@ -41,7 +41,7 @@ jobs:
           VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
         run: |
           # Retrieve a secret from Vault and store it in a variable
-          SECRET=$(vault kv get -field=pat https://vault-cluster-http-vault-0a859582.j.cloud.hashicorp.com/ui/vault/access/identity/entities/85f7a376-4a15-2fe6-1eca-c6ebc14e9b41/metadata?namespace=admin)
+          SECRET=$(vault kv get -field=pat test/vault)
           echo "Vault Secret: $SECRET"
 
       - name: Use Secret for Testing
