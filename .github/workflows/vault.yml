@@ -3,7 +3,7 @@ name: Test Vault Access
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   test-vault-access:
