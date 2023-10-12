@@ -30,7 +30,6 @@ jobs:
 
       - name: Authenticate with Vault
         env:
-          VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
           VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
         run: |
           # Authenticate with Vault using the provided token
@@ -38,10 +37,10 @@ jobs:
 
       - name: Retrieve Secret from Vault
         env:
-          VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
+          VAULT_ADDR: ${{ secrets.VAULT_TOKEN }}
         run: |
           # Retrieve a secret from Vault and store it in a variable
-          SECRET=$(vault kv get -field=pat test/vault)
+          SECRET=$(kv-get -field=api-key secret/test/webapp)
           echo "Vault Secret: $SECRET"
 
       - name: Use Secret for Testing
