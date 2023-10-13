@@ -66,12 +66,12 @@ jobs:
           namespace: ${{ secrets.VAULT_NAMESPACE }}
           exportToken: true
           secrets: |
-            auth/infrastructure/pipeline/aws/access_key | AWS_ACCESS_KEY_ID ;
-            auth/infrastructure/pipeline/aws/secret_key | AWS_SECRET_ACCESS_KEY ;
+            secret/sample-secret | first-secret ;
+            #auth/infrastructure/pipeline/aws/secret_key | AWS_SECRET_ACCESS_KEY ;
         
       - name: Verify secrets
         run: |
-          if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
+          if [ -z "$first-secret" ] || [ -z "$first-secret" ]; then
             echo "Error: AWS secrets are missing or empty."
             exit 1
           fi
