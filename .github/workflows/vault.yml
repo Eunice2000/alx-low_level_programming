@@ -31,6 +31,7 @@ jobs:
         method: approle
         roleId: ${{ secrets.VAULT_ROLE_ID }}
         secretId: ${{ secrets.VAULT_SECRET_ID }}
+        namespace: ${{ secrets.VAULT_NAMESPACE }}
    
         exportToken: true
         secrets: |
