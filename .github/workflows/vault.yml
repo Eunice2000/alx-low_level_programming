@@ -18,14 +18,14 @@ jobs:
         uses: hashicorp/vault-action@v2.1.0
         with:
           url: ${{ secrets.VAULT_ADDR }}
-          method: approle
+          method: aws
           roleId: ${{ secrets.VAULT_ROLE_ID }}
           secretId: ${{ secrets.VAULT_SECRET_ID }}
           exportToken: true
           exportEnv: true
           secrets: |
-            secret/infrastructure/pipeline/aws/ access_key | AWS_ACCESS_KEY_ID ;
-            secret/infrastructure/pipeline/aws/ secret_key | AWS_SECRET_ACCESS_KEY ;
+            infrastructure/pipeline/aws/ access_key | AWS_ACCESS_KEY_ID ;
+            infrastructure/pipeline/aws/ secret_key | AWS_SECRET_ACCESS_KEY ;
 
       - name: Echo AWS Access Key
         run: |
