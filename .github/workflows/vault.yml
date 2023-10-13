@@ -28,22 +28,39 @@ jobs:
           vault --version
         shell: bash
 
-      - name: Authenticate with Vault
+      # - name: Authenticate with Vault
+      #   env:
+      #     VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
+      #   run: |
+      #     # Authenticate with Vault using the provided token
+      #     vault login $VAULT_TOKEN
+
+      # - name: Retrieve Secret from Vault
+      #   env:
+      #     VAULT_ADDR: ${{ secrets.VAULT_TOKEN }}
+      #   run: |
+      #     # Retrieve a secret from Vault and store it in a variable
+      #     SECRET=$(kv-get -field=api-key secret/test/webapp)
+      #     echo "Vault Secret: $SECRET"
+
+      # - name: Use Secret for Testing
+      #   run: |
+      #     # Use the retrieved secret in your testing, for example:
+      #     echo "Using Vault Secret: $SECRET"
+
+      - name: Set up Vault Secrets
         env:
-          VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
+          VAULT_ROLE_ID: ${{ secrets.VAULT_ROLE_ID }}
+          VAULT_SECRET_ID: ${{ secrets.VAULT_SECRET_ID }}
         run: |
-          # Authenticate with Vault using the provided token
-          vault login $VAULT_TOKEN
+          echo "VAULT_ROLE_ID=$VAULT_ROLE_ID" >> $GITHUB_ENV
+          echo "VAULT_SECRET_ID=$VAULT_SECRET_ID" >> $GITHUB_ENV
+
+      # Now you can use the Vault secrets in your subsequent steps.
+
 
       - name: Retrieve Secret from Vault
-        env:
-          VAULT_ADDR: ${{ secrets.VAULT_TOKEN }}
         run: |
-          # Retrieve a secret from Vault and store it in a variable
-          SECRET=$(kv-get -field=api-key secret/test/webapp)
-          echo "Vault Secret: $SECRET"
-
-      - name: Use Secret for Testing
-        run: |
-          # Use the retrieved secret in your testing, for example:
-          echo "Using Vault Secret: $SECRET"
+          VAULT_TOKEN=$(vault write auth/approle/login role_id=$VAULT_ROLE_ID secret_id=$VAULT_SECRET_ID)
+          MY_SECRET=$(kv-get -field=my-token kv/test/webapp)
+          echo "My secret is: $MY_SECRET"
