@@ -1,4 +1,74 @@
-name: Test Vault Access
+# name: Test Vault Access
+
+# on:
+#   push:
+#     branches:
+#       - master
+
+# jobs:
+#   test-vault-access:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v2
+
+#       - name: Install Vault
+#         run: |
+#           # Manually specify the architecture for x64 (amd64) Linux runner
+#           ARCH=amd64
+
+#           # Manually specify the Vault version you want to install
+#           VAULT_VERSION=1.8.2
+
+#           # Download and install the specified Vault binary
+#           curl -fsSL "https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_${ARCH}.zip" -o vault.zip
+#           unzip vault.zip
+#           sudo mv vault /usr/local/bin/vault
+#           vault --version
+#         shell: bash
+
+#       # - name: Authenticate with Vault
+#       #   env:
+#       #     VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
+#       #   run: |
+#       #     # Authenticate with Vault using the provided token
+#       #     vault login $VAULT_TOKEN
+
+#       # - name: Retrieve Secret from Vault
+#       #   env:
+#       #     VAULT_ADDR: ${{ secrets.VAULT_TOKEN }}
+#       #   run: |
+#       #     # Retrieve a secret from Vault and store it in a variable
+#       #     SECRET=$(kv-get -field=api-key secret/test/webapp)
+#       #     echo "Vault Secret: $SECRET"
+
+#       # - name: Use Secret for Testing
+#       #   run: |
+#       #     # Use the retrieved secret in your testing, for example:
+#       #     echo "Using Vault Secret: $SECRET"
+
+#       - name: Set up Vault Secrets
+#         env:
+#           VAULT_ROLE_ID: ${{ secrets.VAULT_ROLE_ID }}
+#           VAULT_SECRET_ID: ${{ secrets.VAULT_SECRET_ID }}
+#         run: |
+#           echo "VAULT_ROLE_ID=$VAULT_ROLE_ID" >> $GITHUB_ENV
+#           echo "VAULT_SECRET_ID=$VAULT_SECRET_ID" >> $GITHUB_ENV
+
+#       # Now you can use the Vault secrets in your subsequent steps.
+
+
+#       - name: Retrieve Secret from Vault
+#         run: |
+#           VAULT_ADDR=https://vault-cluster-public-vault-9d890b91.f5967b67.z1.hashicorp.cloud:8200
+#           VAULT_TOKEN=$(vault write -address=https://vault-cluster-public-vault-9d890b91.f5967b67.z1.hashicorp.cloud:8200/auth/approle/login role_id=$VAULT_ROLE_ID secret_id=$VAULT_SECRET_ID)
+
+#           # VAULT_TOKEN=$(vault write auth/approle/login role_id=$VAULT_ROLE_ID secret_id=$VAULT_SECRET_ID)
+#           MY_SECRET=$(kv-get -field=my-token kv/test/webapp)
+#           echo "My secret is: $MY_SECRET"
+
+name: Retrieve Secret from Vault (AppRole Auth)
 
 on:
   push:
@@ -6,64 +76,34 @@ on:
       - master
 
 jobs:
-  test-vault-access:
+  retrieve-secret:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install Vault
+      - name: Set up Vault CLI
+        uses: hashicorp/setup-vault@v1
+        with:
+          vault-url: ${{ secrets.VAULT_ADDR }}
+
+      - name: Generate Vault AppRole Login Token
         run: |
-          # Manually specify the architecture for x64 (amd64) Linux runner
-          ARCH=amd64
-
-          # Manually specify the Vault version you want to install
-          VAULT_VERSION=1.8.2
-
-          # Download and install the specified Vault binary
-          curl -fsSL "https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_${ARCH}.zip" -o vault.zip
-          unzip vault.zip
-          sudo mv vault /usr/local/bin/vault
-          vault --version
-        shell: bash
-
-      # - name: Authenticate with Vault
-      #   env:
-      #     VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
-      #   run: |
-      #     # Authenticate with Vault using the provided token
-      #     vault login $VAULT_TOKEN
-
-      # - name: Retrieve Secret from Vault
-      #   env:
-      #     VAULT_ADDR: ${{ secrets.VAULT_TOKEN }}
-      #   run: |
-      #     # Retrieve a secret from Vault and store it in a variable
-      #     SECRET=$(kv-get -field=api-key secret/test/webapp)
-      #     echo "Vault Secret: $SECRET"
-
-      # - name: Use Secret for Testing
-      #   run: |
-      #     # Use the retrieved secret in your testing, for example:
-      #     echo "Using Vault Secret: $SECRET"
-
-      - name: Set up Vault Secrets
+          role-id=vault read auth/approle/role/webapp/role-id
+          secret-id=vault write -force auth/approle/role/webapp/secret-id
+          approle_path="approle"
+          # Authenticate with Vault using AppRole and retrieve the login token
+          vault write auth/approle/login \ $role-id \ $secret-id
+          login_response=$(vault write -format=json auth/$approle_path/login role_id=$role_id secret_id=$secret_id)
+          export VAULT_TOKEN=$(echo $login_response | jq -r .auth.client_token)
         env:
-          VAULT_ROLE_ID: ${{ secrets.VAULT_ROLE_ID }}
-          VAULT_SECRET_ID: ${{ secrets.VAULT_SECRET_ID }}
-        run: |
-          echo "VAULT_ROLE_ID=$VAULT_ROLE_ID" >> $GITHUB_ENV
-          echo "VAULT_SECRET_ID=$VAULT_SECRET_ID" >> $GITHUB_ENV
-
-      # Now you can use the Vault secrets in your subsequent steps.
-
+          VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
 
       - name: Retrieve Secret from Vault
         run: |
-          VAULT_ADDR=https://vault-cluster-public-vault-9d890b91.f5967b67.z1.hashicorp.cloud:8200
-          VAULT_TOKEN=$(vault write -address=https://vault-cluster-public-vault-9d890b91.f5967b67.z1.hashicorp.cloud:8200/auth/approle/login role_id=$VAULT_ROLE_ID secret_id=$VAULT_SECRET_ID)
+          # Replace 'secret/your-secret-path' with the actual path to your secret
+          # Replace 'your-secret-key' with the key you want to retrieve
+          SECRET_VALUE=$(get-v secret/sample-secret)
+          echo "Secret Value: $SECRET_VALUE"
 
-          # VAULT_TOKEN=$(vault write auth/approle/login role_id=$VAULT_ROLE_ID secret_id=$VAULT_SECRET_ID)
-          MY_SECRET=$(kv-get -field=my-token kv/test/webapp)
-          echo "My secret is: $MY_SECRET"
