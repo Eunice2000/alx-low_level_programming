@@ -3,7 +3,7 @@ name: Terraform
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   terraform:
@@ -23,16 +23,28 @@ jobs:
           secretId: ${{ secrets.VAULT_SECRET_ID }}
           namespace: ${{ secrets.VAULT_NAMESPACE }}
           exportToken: true
+          exportEnv: true
+          secrets: |
+            infrastructure/pipeline/aws/creds/pipeline/access_key | AWS_ACCESS_KEY_ID ;
+            infrastructure/pipeline/aws/creds/pipeline/secret_key | AWS_SECRET_ACCESS_KEY ;
 
-      - name: Run Custom Command
-        run: |
-          # Run your custom command here
-          # Replace 'kv-get secret/sample-secret' with the actual command you want to run
-          kv-get secret/sample-secret | first-secret
-          
       - name: Verify secrets
         run: |
-          if [ -z "$first-secret" ] || [ -z "$first-secret" ]; then
-            echo "Error: Secrets are missing or empty."
+          if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
+            echo "Error: AWS secrets are missing or empty."
             exit 1
           fi
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 0.13.7
+
+      - name: Initialize Terraform
+        run: terraform init
+
+      - name: Plan Terraform
+        run: terraform plan
+
+      - name: Apply Terraform
+        run: terraform apply --auto-approve
