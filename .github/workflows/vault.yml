@@ -1,110 +1,105 @@
-name: Test Vault Access
+name: 'Terraform'
 
 on:
   push:
     branches:
-      - master
+    - main
+  #   paths-ignore:
+  #   - 'vault/**'
+  #   - 'infrastructure/**'
+  # pull_request:
 
 jobs:
-  test-vault-access:
+  terraform:
+    name: 'Terraform'
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          vault-url: ${{ secrets.VAULT_ADDR }}
-
-      - name: Install Vault
-        run: |
-          # Manually specify the architecture for x64 (amd64) Linux runner
-          ARCH=amd64
-
-          # Manually specify the Vault version you want to install
-          VAULT_VERSION=1.8.2
-
-          # Download and install the specified Vault binary
-          curl -fsSL "https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_${ARCH}.zip" -o vault.zip
-          unzip vault.zip
-          sudo mv vault /usr/local/bin/vault
-          vault --version
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
         shell: bash
 
-#       # - name: Authenticate with Vault
-#       #   env:
-#       #     VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
-#       #   run: |
-#       #     # Authenticate with Vault using the provided token
-#       #     vault login $VAULT_TOKEN
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v2
 
-#       # - name: Retrieve Secret from Vault
-#       #   env:
-#       #     VAULT_ADDR: ${{ secrets.VAULT_TOKEN }}
-#       #   run: |
-#       #     # Retrieve a secret from Vault and store it in a variable
-#       #     SECRET=$(kv-get -field=api-key secret/test/webapp)
-#       #     echo "Vault Secret: $SECRET"
+    - name: Import Secrets
+      uses: hashicorp/vault-action@v2.1.0
+      with:
+        url: ${{ secrets.VAULT_ADDR }}
+        method: approle
+        roleId: ${{ secrets.VAULT_ROLE_ID }}
+        secretId: ${{ secrets.VAULT_SECRET_ID }}
+   
+        exportToken: true
+        secrets: |
+            infrastructure/pipeline/aws/creds/pipeline access_key | AWS_ACCESS_KEY_ID ;
+            infrastructure/pipeline/aws/creds/pipeline secret_key | AWS_SECRET_ACCESS_KEY ;
+          
+    - name: Verify secrets
+      run: |
+        if [ ${#AWS_ACCESS_KEY_ID} -lt 1 ]; then echo "error" ; exit; fi
+        if [ ${#AWS_SECRET_ACCESS_KEY} -lt 1 ]; then echo "error" ; exit; fi
+     
 
-#       # - name: Use Secret for Testing
-#       #   run: |
-#       #     # Use the retrieved secret in your testing, for example:
-#       #     echo "Using Vault Secret: $SECRET"
+    # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
+    # - name: Setup Terraform
+    #   uses: hashicorp/setup-terraform@v1
+    #   with:
+    #     terraform_version: 0.14.2
+    #     cli_config_credentials_token: ${{ env.TFC_TOKEN }}
 
-#       - name: Set up Vault Secrets
-#         env:
-#           VAULT_ROLE_ID: ${{ secrets.VAULT_ROLE_ID }}
-#           VAULT_SECRET_ID: ${{ secrets.VAULT_SECRET_ID }}
-#         run: |
-#           echo "VAULT_ROLE_ID=$VAULT_ROLE_ID" >> $GITHUB_ENV
-#           echo "VAULT_SECRET_ID=$VAULT_SECRET_ID" >> $GITHUB_ENV
+    # # Checks that all Terraform configuration files adhere to a canonical format
+    # - name: Terraform Format
+    #   id: fmt
+    #   run: terraform fmt -check
 
-#       # Now you can use the Vault secrets in your subsequent steps.
+    # # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    # - name: Terraform Init
+    #   id: init
+    #   run: terraform init -backend-config=backends/prod
 
+    # # Generates an execution plan for Terraform
+    # - name: Terraform Plan
+    #   id: plan
+    #   if: github.event_name == 'pull_request'
+    #   env:
+    #     VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
+    #     VAULT_NAMESPACE: ${{ secrets.VAULT_NAMESPACE }}
+    #   run: terraform plan -var-file=prod.tfvars -no-color
+    #   continue-on-error: true
 
-#       - name: Retrieve Secret from Vault
-#         run: |
-#           VAULT_ADDR=https://vault-cluster-public-vault-9d890b91.f5967b67.z1.hashicorp.cloud:8200
-#           VAULT_TOKEN=$(vault write -address=https://vault-cluster-public-vault-9d890b91.f5967b67.z1.hashicorp.cloud:8200/auth/approle/login role_id=$VAULT_ROLE_ID secret_id=$VAULT_SECRET_ID)
+    # - uses: actions/github-script@0.9.0
+    #   if: github.event_name == 'pull_request'
+    #   env:
+    #     PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+    #   with:
+    #     github-token: ${{ secrets.GITHUB_TOKEN }}
+    #     script: |
+    #       const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+    #       #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+    #       #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+    #       <details><summary>Show Plan</summary><code>${process.env.PLAN}<code></details>
 
-#           # VAULT_TOKEN=$(vault write auth/approle/login role_id=$VAULT_ROLE_ID secret_id=$VAULT_SECRET_ID)
-#           MY_SECRET=$(kv-get -field=my-token kv/test/webapp)
-#           echo "My secret is: $MY_SECRET"
+    #       *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
 
-# name: Retrieve Secret from Vault (AppRole Auth)
+    #       github.issues.createComment({
+    #         issue_number: context.issue.number,
+    #         owner: context.repo.owner,
+    #         repo: context.repo.repo,
+    #         body: output
+    #       })
 
-# on:
-#   push:
-#     branches:
-#       - master
+    # - name: Terraform Plan Status
+    #   if: steps.plan.outcome == 'failure'
+    #   run: exit 1
 
-# jobs:
-#   retrieve-secret:
-#     runs-on: ubuntu-latest
-
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v2
-
-#       - name: Set up Vault CLI
-#         uses: hashicorp/setup-vault@v1
-       
-
-      - name: Generate Vault AppRole Login Token
-        run: |
-          role-id=vault read auth/approle/role/webapp/role-id
-          secret-id=vault write -force auth/approle/role/webapp/secret-id
-          approle_path="approle"
-          # Authenticate with Vault using AppRole and retrieve the login token
-          vault write auth/approle/login \ $role-id \ $secret-id
-          login_response=$(vault write -format=json auth/$approle_path/login role_id=$role_id secret_id=$secret_id)
-          export VAULT_TOKEN=$(echo $login_response | jq -r .auth.client_token)
-        env:
-          VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
-
-      - name: Retrieve Secret from Vault
-        run: |
-          # Replace 'secret/your-secret-path' with the actual path to your secret
-          # Replace 'your-secret-key' with the key you want to retrieve
-          SECRET_VALUE=$(get-v secret/sample-secret)
-          echo "Secret Value: $SECRET_VALUE"
-
+    #   # On push to main, build or change infrastructure according to Terraform configuration files
+    #   # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
+    # - name: Terraform Apply
+    #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    #   env:
+    #     VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
+    #     VAULT_NAMESPACE: ${{ secrets.VAULT_NAMESPACE }}
+    #   run: terraform apply -auto-approve -var-file=prod.tfvars
