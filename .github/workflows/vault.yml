@@ -24,8 +24,8 @@ jobs:
           exportToken: true
           exportEnv: true
           secrets: |
-            infrastructure/pipeline/aws/ access_key | AWS_ACCESS_KEY_ID ;
-            infrastructure/pipeline/aws/ secret_key | AWS_SECRET_ACCESS_KEY ;
+            infrastructure/pipeline/aws/creds/pipeline access_key | AWS_ACCESS_KEY_ID ;
+            infrastructure/pipeline/aws/creds/pipeline secret_key | AWS_SECRET_ACCESS_KEY ;
 
       - name: Echo AWS Access Key
         run: |
