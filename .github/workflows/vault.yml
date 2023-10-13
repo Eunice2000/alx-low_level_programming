@@ -1,32 +1,34 @@
-# name: Test Vault Access
+name: Test Vault Access
 
-# on:
-#   push:
-#     branches:
-#       - master
+on:
+  push:
+    branches:
+      - master
 
-# jobs:
-#   test-vault-access:
-#     runs-on: ubuntu-latest
+jobs:
+  test-vault-access:
+    runs-on: ubuntu-latest
 
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          vault-url: ${{ secrets.VAULT_ADDR }}
 
-#       - name: Install Vault
-#         run: |
-#           # Manually specify the architecture for x64 (amd64) Linux runner
-#           ARCH=amd64
+      - name: Install Vault
+        run: |
+          # Manually specify the architecture for x64 (amd64) Linux runner
+          ARCH=amd64
 
-#           # Manually specify the Vault version you want to install
-#           VAULT_VERSION=1.8.2
+          # Manually specify the Vault version you want to install
+          VAULT_VERSION=1.8.2
 
-#           # Download and install the specified Vault binary
-#           curl -fsSL "https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_${ARCH}.zip" -o vault.zip
-#           unzip vault.zip
-#           sudo mv vault /usr/local/bin/vault
-#           vault --version
-#         shell: bash
+          # Download and install the specified Vault binary
+          curl -fsSL "https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_${ARCH}.zip" -o vault.zip
+          unzip vault.zip
+          sudo mv vault /usr/local/bin/vault
+          vault --version
+        shell: bash
 
 #       # - name: Authenticate with Vault
 #       #   env:
@@ -68,25 +70,24 @@
 #           MY_SECRET=$(kv-get -field=my-token kv/test/webapp)
 #           echo "My secret is: $MY_SECRET"
 
-name: Retrieve Secret from Vault (AppRole Auth)
+# name: Retrieve Secret from Vault (AppRole Auth)
 
-on:
-  push:
-    branches:
-      - master
+# on:
+#   push:
+#     branches:
+#       - master
 
-jobs:
-  retrieve-secret:
-    runs-on: ubuntu-latest
+# jobs:
+#   retrieve-secret:
+#     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v2
 
-      - name: Set up Vault CLI
-        uses: hashicorp/setup-vault@v1
-        with:
-          vault-url: ${{ secrets.VAULT_ADDR }}
+#       - name: Set up Vault CLI
+#         uses: hashicorp/setup-vault@v1
+       
 
       - name: Generate Vault AppRole Login Token
         run: |
