@@ -1,45 +1,3 @@
-# name: 'Terraform'
-
-# on:
-#   push:
-#     branches:
-#       - master
-
-# jobs:
-#   terraform:
-#     name: 'Terraform'
-#     runs-on: ubuntu-latest
-
-#     steps:
-#       - name: Checkout
-#         uses: actions/checkout@v2
-
-#       - name: Import Secrets
-#         uses: hashicorp/vault-action@v2.1.0
-#         with:
-#           url: ${{ secrets.VAULT_ADDR }}
-#           method: approle
-#           roleId: ${{ secrets.VAULT_ROLE_ID }}
-#           secretId: ${{ secrets.VAULT_SECRET_ID }}
-#           namespace: ${{ secrets.VAULT_NAMESPACE }}
-#           exportToken: true
-#           secrets: |
-#             infrastructure/pipeline/aws/creds/pipeline access_key | AWS_ACCESS_KEY_ID ;
-#             infrastructure/pipeline/aws/creds/pipeline secret_key | AWS_SECRET_ACCESS_KEY ;
-          
-#       - name: Verify secrets
-#         run: |
-#           if [ ${#AWS_ACCESS_KEY_ID} -lt 1 ]; then echo "error" ; exit; fi
-#           if [ ${#AWS_SECRET_ACCESS_KEY} -lt 1 ]; then echo "error" ; exit; fi
-
-#       - name: Set Environment Variables
-#         run: |
-#           echo "export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}" >> $GITHUB_ENV
-#           echo "export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" >> $GITHUB_ENV
-
-#   # Add more jobs or steps here if needed
-
-
 name: Terraform
 
 on:
@@ -65,15 +23,16 @@ jobs:
           secretId: ${{ secrets.VAULT_SECRET_ID }}
           namespace: ${{ secrets.VAULT_NAMESPACE }}
           exportToken: true
-          # secrets: |
-          #   secret/sample-secret | first-secret ;
-          #   #auth/infrastructure/pipeline/aws/secret_key | AWS_SECRET_ACCESS_KEY ;
-          run:
-            kv-get secret/sample-secret 
-            
+
+      - name: Run Custom Command
+        run: |
+          # Run your custom command here
+          # Replace 'kv-get secret/sample-secret' with the actual command you want to run
+          kv-get secret/sample-secret
+          
       - name: Verify secrets
         run: |
           if [ -z "$first-secret" ] || [ -z "$first-secret" ]; then
-            echo "Error: AWS secrets are missing or empty."
+            echo "Error: Secrets are missing or empty."
             exit 1
           fi
