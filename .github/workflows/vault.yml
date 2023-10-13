@@ -28,7 +28,7 @@ jobs:
         run: |
           # Run your custom command here
           # Replace 'kv-get secret/sample-secret' with the actual command you want to run
-          kv-get secret/sample-secret
+          kv-get secret/sample-secret | first-secret
           
       - name: Verify secrets
         run: |
