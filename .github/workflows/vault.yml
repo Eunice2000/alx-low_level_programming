@@ -61,6 +61,9 @@ jobs:
 
       - name: Retrieve Secret from Vault
         run: |
-          VAULT_TOKEN=$(vault write auth/approle/login role_id=$VAULT_ROLE_ID secret_id=$VAULT_SECRET_ID)
+          VAULT_ADDR=https://vault-cluster-http-vault-6791b819.j.cloud.hashicorp.com/
+          VAULT_TOKEN=$(vault write -address=$VAULT_ADDR auth/approle/login role_id=$VAULT_ROLE_ID secret_id=$VAULT_SECRET_ID)
+
+          # VAULT_TOKEN=$(vault write auth/approle/login role_id=$VAULT_ROLE_ID secret_id=$VAULT_SECRET_ID)
           MY_SECRET=$(kv-get -field=my-token kv/test/webapp)
           echo "My secret is: $MY_SECRET"
