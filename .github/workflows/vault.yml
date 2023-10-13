@@ -65,10 +65,12 @@ jobs:
           secretId: ${{ secrets.VAULT_SECRET_ID }}
           namespace: ${{ secrets.VAULT_NAMESPACE }}
           exportToken: true
-          secrets: |
-            secret/sample-secret | first-secret ;
-            #auth/infrastructure/pipeline/aws/secret_key | AWS_SECRET_ACCESS_KEY ;
-        
+          # secrets: |
+          #   secret/sample-secret | first-secret ;
+          #   #auth/infrastructure/pipeline/aws/secret_key | AWS_SECRET_ACCESS_KEY ;
+          run:
+            kv-get secret/sample-secret 
+            
       - name: Verify secrets
         run: |
           if [ -z "$first-secret" ] || [ -z "$first-secret" ]; then
