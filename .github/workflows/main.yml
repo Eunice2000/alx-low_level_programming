@@ -1,27 +1,25 @@
 name: testimg workflow
 
 on:
-  push: 
-    branches: 
+  push:
+    branches:
       - "master"
-    # paths: 
-    #   - 0x00-hello_world
 
-jobs: 
+jobs:
   python-devops:
     name: test
     runs-on: ubuntu-latest
-    steps: 
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0 
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'  # Use the appropriate Python version
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'  # Use the appropriate Python version
 
-      - name: Run Python script
-        run: |
-          python -c "import re, os; print('Running Python script'); repo_name = 'alx-low_level_programming'; module = r'0x00-hello_world'; check_for_module = re.search(module, repo_name); if check_for_module: print('Found module'); os.system('cd 0x00-hello_world && ls'); else: print('Module not found')"
+    - name: Run Python script
+      run: |
+        python -c "import re, os; print('Running Python script'); repo_name = 'alx-low_level_programming'; module = r'0x00-hello_world'; check_for_module = re.search(module, repo_name); if check_for_module: print('Found module'); os.system('cd 0x00-hello_world && ls'); else: print('Module not found')"
