@@ -22,15 +22,16 @@ jobs:
 
       - name: Run Python script and check module
         run: |
+          cd alx-low_level_programming
           python -c "
           import os
           import re
           
-          # List the contents of the repository
-          repo_name = 'alx-low_level_programming'
+          # Define the folder to check for
           module = '0x00-hello_world'
           
-          repo_contents = os.popen(f'ls -R {repo_name}').read()
+          # List the contents of the current directory
+          repo_contents = os.popen('ls -R').read()
           
           # Check if the folder exists using regex
           if re.search(rf'{module}', repo_contents):
