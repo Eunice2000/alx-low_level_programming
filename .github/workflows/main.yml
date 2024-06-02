@@ -10,19 +10,99 @@ jobs:
     name: test
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'  # Use the appropriate Python version
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'  # Use the appropriate Python version
 
-    - name: Run Python script and check module
-      run: |
-        python -c "
+      - name: Run Python script and check module
+        run: |
+          python -c "
+import os
+import re
+
+# List the contents of the repository
+repo_name = 'alx-low_level_programming'
+module = '0x00-hello_world'
+
+repo_contents = os.popen(f'ls -R {repo_name}').read()
+
+# Check if the folder exists using regex
+if re.search(rf'{module}', repo_contents):
+    print('Found module')
+else:
+    print('Module not found')
+"
+name: testimg workflow
+
+on:
+  push:
+    branches:
+      - "master"
+
+jobs:
+  python-devops:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'  # Use the appropriate Python version
+
+      - name: Run Python script and check module
+        run: |
+          python -c "
+import os
+import re
+
+# List the contents of the repository
+repo_name = 'alx-low_level_programming'
+module = '0x00-hello_world'
+
+repo_contents = os.popen(f'ls -R {repo_name}').read()
+
+# Check if the folder exists using regex
+if re.search(rf'{module}', repo_contents):
+    print('Found module')
+else:
+    print('Module not found')
+"
+name: testimg workflow
+
+on:
+  push:
+    branches:
+      - "master"
+
+jobs:
+  python-devops:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'  # Use the appropriate Python version
+
+      - name: Run Python script and check module
+        run: |
+          python -c "
 import os
 import re
 
