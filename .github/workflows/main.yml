@@ -1,8 +1,9 @@
-name: testimg worklow
+name: testimg workflow
 
 on:
   push: 
-    branches: "master"
+    branches: 
+      - "master"
     paths: 
       - 0x00-hello_world
 
@@ -11,10 +12,16 @@ jobs:
     name: test
     runs-on: ubuntu-latest
     steps: 
-      - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
         with:
           fetch-depth: 0 
-      - name: run-python-script
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'  # Use the appropriate Python version
+
+      - name: Run Python script
         run: |
-          import re 
-        
+          python -c "import re; print('Running Python script')"
