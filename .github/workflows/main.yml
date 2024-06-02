@@ -26,22 +26,26 @@ jobs:
           import os
           import re
           
+          # Define the folder and module to check for
           repo_name = '0x00-hello_world'
           module = '1-compiler'
           
-          # Check if the folder exists
+          # Check if the repo_name folder exists
           if os.path.isdir(repo_name):
               print(f'Found folder {repo_name}')
+              
+              # Change directory to repo_name
               os.chdir(repo_name)
               
-              # List the contents of the repository
+              # List the contents of the current directory
               repo_contents = os.popen('ls -R').read()
               
-              # Check if the module exists using regex
+              # Check if the module exists within the current directory
               if re.search(rf'{module}', repo_contents):
-                  print('Found module')
+                  print(f'Found module {module}')
+                  os.system('ls')
               else:
-                  print('Module not found')
+                  print(f'Module {module} not found')
           else:
               print(f'Folder {repo_name} not found')
-                    "
+          "
