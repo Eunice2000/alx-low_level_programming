@@ -38,10 +38,10 @@ jobs:
               os.chdir(repo_name)
               
               # # List the contents of the current directory
-              # repo_contents = os.popen('ls -R').read()
+              repo_contents = os.popen('ls -R').read()
               
               # Check if the module exists within the current directory
-              if re.search(rf'{module}', repo_name):
+              if re.search(rf'{module}', repo_contents):
                   print(f'Found module {module}')
                   os.system('ls')
               else:
