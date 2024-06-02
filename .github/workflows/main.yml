@@ -23,7 +23,7 @@ jobs:
     - name: Run Python script and check module
       run: |
         python -c "import re, os; print('Running Python script');
-        repo_name = 'alx-low_level_programming';
+        repo_name = 'cd alx-low_level_programming';
         module = r'README.md'; 
         check_for_module = re.search(module, repo_name); 
         if check_for_module: print('Found module'); 
