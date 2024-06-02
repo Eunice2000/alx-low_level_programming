@@ -1,46 +1,3 @@
-# name: testimg workflow
-
-# on:
-#   push:
-#     branches:
-#       - "master"
-
-# jobs:
-#   python-devops:
-#     name: test
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v2
-#         with:
-#           fetch-depth: 0
-
-#       - name: Set up Python
-#         uses: actions/setup-python@v2
-#         with:
-#           python-version: '3.x'  # Use the appropriate Python version
-
-#       - name: Run Python script and check module
-#         run: |
-#           python -c "
-#           import os
-#           import re
-          
-#           # List the contents of the repository
-#           repo_name = '0x00-hello_world'
-#           module = '1-compiler' 
-
-          
-#           repo_contents = os.popen(f'ls -R {repo_name}').read()
-          
-#           # Check if the folder exists using regex
-#           if re.search(rf'{module}', repo_contents):
-#               print('Found module')
-#           else:
-#               print('Module not found')
-#           "
-
-
 name: testimg workflow
 
 on:
@@ -66,19 +23,25 @@ jobs:
       - name: Run Python script and check module
         run: |
           python -c "
+          import os
           import re
           
-          # List the contents of the repository
           repo_name = '0x00-hello_world'
-          module = r'1-compiler' 
-
+          module = '1-compiler'
           
-          # repo_contents = os.popen(f'ls -R {repo_name}').read()
-          
-          # Check if the folder exists using regex
-          if re.search(module, repo_name):
-              print('Found module')
+          # Check if the folder exists
+          if os.path.isdir(repo_name):
+              print(f'Found folder {repo_name}')
+              os.chdir(repo_name)
+              
+              # List the contents of the repository
+              repo_contents = os.popen('ls -R').read()
+              
+              # Check if the module exists using regex
+              if re.search(rf'{module}', repo_contents):
+                  print('Found module')
+              else:
+                  print('Module not found')
           else:
-              print('Module not found')
-          "
-
+              print(f'Folder {repo_name} not found')
+                    "
