@@ -24,14 +24,13 @@ jobs:
 
       - name: Run Python script
         run: |
-          python -c "import re; print('Running Python script')
-          repoNmae = "alx-low_level_programming"
-          module = r'0x00-hello_world'
-          checkForModule = re.search( module, repoName)
-          if checForModule:
-            "cd 0x00-hello_world && ls"
-            
-          else:
-            print("not found")
-            "
-          
+          python -c "import re, os; \
+          print('Running Python script'); \
+          repo_name = 'alx-low_level_programming'; \
+          module = r'0x00-hello_world'; \
+          check_for_module = re.search(module, repo_name); \
+          if check_for_module: \
+              print('Found module'); \
+              os.system('cd 0x00-hello_world && ls'); \
+          else: \
+              print('Module not found')"
