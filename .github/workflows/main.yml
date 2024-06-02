@@ -22,10 +22,19 @@ jobs:
 
     - name: Run Python script and check module
       run: |
-        python -c "import re, os; print('Running Python script');
-        repo_name = 'cd alx-low_level_programming';
-        module = r'README.md'; 
-        check_for_module = re.search(module, repo_name); 
-        if check_for_module: print('Found module'); 
-        else: print('Module not found'); os.system('exit 0')"  # Exit with success code 0
-    
+        python -c "
+import os
+import re
+
+# List the contents of the repository
+repo_name = 'alx-low_level_programming'
+module = '0x00-hello_world'
+
+repo_contents = os.popen(f'ls -R {repo_name}').read()
+
+# Check if the folder exists using regex
+if re.search(rf'{module}', repo_contents):
+    print('Found module')
+else:
+    print('Module not found')
+"
