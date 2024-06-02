@@ -24,7 +24,7 @@ jobs:
       run: |
         python -c "import re, os; print('Running Python script');
         repo_name = 'alx-low_level_programming';
-        module = r'0x00-hello_world'; 
+        module = r'README.md'; 
         check_for_module = re.search(module, repo_name); 
         if check_for_module: print('Found module'); 
         else: print('Module not found'); os.system('exit 0')"  # Exit with success code 0
