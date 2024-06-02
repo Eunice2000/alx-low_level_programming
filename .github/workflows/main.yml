@@ -4,8 +4,8 @@ on:
   push: 
     branches: 
       - "master"
-    paths: 
-      - 0x00-hello_world
+    # paths: 
+    #   - 0x00-hello_world
 
 jobs: 
   python-devops:
