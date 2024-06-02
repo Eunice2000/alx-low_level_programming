@@ -20,6 +20,10 @@ jobs:
       with:
         python-version: '3.x'  # Use the appropriate Python version
 
-    - name: Run Python script
+    - name: Install pathlib library
       run: |
-        python -c "import re, os; print('Running Python script'); repo_name = 'alx-low_level_programming'; module = r'0x00-hello_world'; check_for_module = re.search(module, repo_name); if check_for_module: print('Found module'); os.system('cd 0x00-hello_world && ls'); else: print('Module not found')"  # Removed the extra quotation mark
+        python -m pip install pathlib
+
+    - name: Run Python script and check module
+      run: |
+        python -c "import re, os, pathlib; print('Running Python script'); repo_name = 'alx-low_level_programming'; module = r'0x00-hello_world'; check_for_module = re.search(module, repo_name); if check_for_module: print('Found module'); else: print('Module not found'); path = pathlib.Path('0x00-hello_world'); if path.is_dir(): print('Module directory found'); else: print('Module directory not found')"
